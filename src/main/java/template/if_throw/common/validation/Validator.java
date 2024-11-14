@@ -1,28 +1,39 @@
 package template.if_throw.common.validation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Validator {
     public static ValidationStep check(boolean condition) {
-        return new ValidationStep(condition);
+        return new ValidationStep(new Validation(condition, null));
     }
 
     public static class ValidationStep {
-        private final List<Validation> validations = new ArrayList<>();
+        private final List<Validation> validations;
 
-        private ValidationStep(boolean condition) {
-            validations.add(new Validation(condition));
+        private ValidationStep(Validation validation) {
+            this.validations = Collections.singletonList(validation);
+        }
+
+        private ValidationStep(List<Validation> validations) {
+            this.validations = Collections.unmodifiableList(validations);
         }
 
         public ValidationStep withError(RuntimeException exception) {
-            validations.get(validations.size() - 1).setException(exception);
-            return this;
+            // 마지막 validation을 새로운 exception으로 교체
+            List<Validation> newValidations = new ArrayList<>(validations);
+            Validation lastValidation = newValidations.remove(newValidations.size() - 1);
+            newValidations.add(new Validation(lastValidation.condition, exception));
+
+            return new ValidationStep(newValidations);
         }
 
         public ValidationStep andCheck(boolean condition) {
-            validations.add(new Validation(condition));
-            return this;
+            List<Validation> newValidations = new ArrayList<>(validations);
+            newValidations.add(new Validation(condition, null));
+
+            return new ValidationStep(newValidations);
         }
 
         public void validateAll() {
@@ -30,15 +41,12 @@ public class Validator {
         }
     }
 
-    private static class Validation {
+    private static final class Validation {
         private final boolean condition;
-        private RuntimeException exception;
+        private final RuntimeException exception;
 
-        Validation(boolean condition) {
+        private Validation(boolean condition, RuntimeException exception) {
             this.condition = condition;
-        }
-
-        void setException(RuntimeException exception) {
             this.exception = exception;
         }
 
