@@ -1,4 +1,4 @@
-package template.try_catch;
+package template.while_try_catch_throw;
 
 import static camp.nextstep.edu.missionutils.Console.readLine;
 
@@ -13,14 +13,15 @@ class InputView {
     }
 
     void readNumber() {
-        List<String> strings = RetryTemplate.executeWithRetry(this::inputNumber);
+        List<String> strings = RetryTemplate.executeWithRetry(this::requestNumber);
 
     }
 
 
-    public List<String> inputNumber() {
+    public List<String> requestNumber() {
         System.out.println("숫자를 입력해주세요. 최소길이 4");
         List<String> input = Arrays.stream(readLine().trim().split(",")).toList();
+
         if (input.size() <= 3) {
             throw new IllegalArgumentException("땡");
         }

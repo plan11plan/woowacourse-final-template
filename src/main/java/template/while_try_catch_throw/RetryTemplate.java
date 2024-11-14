@@ -1,4 +1,4 @@
-package template.try_catch;
+package template.while_try_catch_throw;
 
 import java.util.function.Supplier;
 
