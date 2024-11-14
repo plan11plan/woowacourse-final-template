@@ -1,42 +1,42 @@
 package template.if_throw.common.validation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Validator {
-    public static ValidationStep check(boolean condition) {
-        return new ValidationStep(new Validation(condition, null));
+    private final List<Validation> validations;
+
+    private Validator(List<Validation> validations) {
+        this.validations = validations;
     }
 
-    public static class ValidationStep {
-        private final List<Validation> validations;
+    public static ValidationBuilder check(boolean condition) {
+        return new ValidationBuilder(condition);
+    }
 
-        private ValidationStep(Validation validation) {
-            this.validations = Collections.singletonList(validation);
+    public static class ValidationBuilder {
+        private final List<Validation> validations = new ArrayList<>();
+        private boolean lastCondition;
+
+        private ValidationBuilder(boolean condition) {
+            this.lastCondition = condition;
         }
 
-        private ValidationStep(List<Validation> validations) {
-            this.validations = Collections.unmodifiableList(validations);
+        public ValidationBuilder withError(RuntimeException exception) {
+            validations.add(new Validation(lastCondition, exception));
+            return this;
         }
 
-        public ValidationStep withError(RuntimeException exception) {
-            // 마지막 validation을 새로운 exception으로 교체
-            List<Validation> newValidations = new ArrayList<>(validations);
-            Validation lastValidation = newValidations.remove(newValidations.size() - 1);
-            newValidations.add(new Validation(lastValidation.condition, exception));
-
-            return new ValidationStep(newValidations);
+        public ValidationBuilder and() {
+            return this;
         }
 
-        public ValidationStep andCheck(boolean condition) {
-            List<Validation> newValidations = new ArrayList<>(validations);
-            newValidations.add(new Validation(condition, null));
-
-            return new ValidationStep(newValidations);
+        public ValidationBuilder check(boolean condition) {
+            this.lastCondition = condition;
+            return this;
         }
 
-        public void validateAll() {
+        public void validate() {
             validations.forEach(Validation::validate);
         }
     }

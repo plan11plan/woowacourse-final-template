@@ -22,32 +22,31 @@ public class LottoValidator {
     private static void validateNumbers(List<Integer> numbers) {
         Validator.check(numbers != null)
                 .withError(new LottoValidationException.NullNumbers())
-
-                .andCheck(numbers.size() == LOTTO_SIZE)
+                .and()
+                .check(numbers.size() == LOTTO_SIZE)
                 .withError(new LottoValidationException.InvalidSize())
-
-                .andCheck(hasNoDuplicates(numbers))
+                .and()
+                .check(hasNoDuplicates(numbers))
                 .withError(new LottoValidationException.DuplicateNumbers())
-
-                .validateAll();
+                .validate();
 
         numbers.forEach(number ->
                 Validator.check(isValidRange(number))
                         .withError(new LottoValidationException.InvalidRange(number))
-                        .validateAll()
+                        .validate()
         );
     }
 
     private static void validatePrice(int price) {
         Validator.check(price >= MINIMUM_PRICE)
                 .withError(new LottoValidationException.InvalidPrice(price))
-                .validateAll();
+                .validate();
     }
 
     private static void validateRound(int round) {
         Validator.check(round >= MINIMUM_ROUND)
                 .withError(new LottoValidationException.InvalidRound(round))
-                .validateAll();
+                .validate();
     }
 
     private static boolean isValidRange(int number) {

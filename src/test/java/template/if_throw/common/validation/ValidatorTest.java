@@ -18,7 +18,7 @@ class ValidatorTest {
             // when & then
             Validator.check(true)
                     .withError(new IllegalArgumentException())
-                    .validateAll();
+                    .validate();
         }
 
         @Test
@@ -28,7 +28,7 @@ class ValidatorTest {
             assertThatThrownBy(() ->
                     Validator.check(false)
                             .withError(new IllegalArgumentException("error"))
-                            .validateAll()
+                            .validate()
             )
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("error");
@@ -45,9 +45,10 @@ class ValidatorTest {
             // when & then
             Validator.check(true)
                     .withError(new IllegalArgumentException())
-                    .andCheck(true)
+                    .and()
+                    .check(true)
                     .withError(new IllegalArgumentException())
-                    .validateAll();
+                    .validate();
         }
 
         @Test
@@ -61,9 +62,9 @@ class ValidatorTest {
             assertThatThrownBy(() ->
                     Validator.check(false)
                             .withError(new IllegalArgumentException(firstExceptionMessage))
-                            .andCheck(true)
+                            .check(true)
                             .withError(new IllegalArgumentException(secondExceptionMessage))
-                            .validateAll()
+                            .validate()
             )
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(firstExceptionMessage);
@@ -80,9 +81,10 @@ class ValidatorTest {
             assertThatThrownBy(() ->
                     Validator.check(true)
                             .withError(new IllegalArgumentException(firstExceptionMessage))
-                            .andCheck(false)
+                            .and()
+                            .check(false)
                             .withError(new IllegalArgumentException(secondExceptionMessage))
-                            .validateAll()
+                            .validate()
             )
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage(secondExceptionMessage);
@@ -102,9 +104,10 @@ class ValidatorTest {
             // when & then
             Validator.check(age > 0)
                     .withError(new IllegalArgumentException("나이는 양수여야 합니다"))
-                    .andCheck(age < 150)
+                    .and()
+                    .check(age < 150)
                     .withError(new IllegalArgumentException("나이가 너무 큽니다"))
-                    .validateAll();
+                    .validate();
         }
 
         @Test
@@ -117,9 +120,10 @@ class ValidatorTest {
             assertThatThrownBy(() ->
                     Validator.check(age > 0)
                             .withError(new IllegalArgumentException("나이는 양수여야 합니다"))
-                            .andCheck(age < 150)
+                            .and()
+                            .check(age < 150)
                             .withError(new IllegalArgumentException("나이가 너무 큽니다"))
-                            .validateAll()
+                            .validate()
             )
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("나이는 양수여야 합니다");
@@ -135,9 +139,9 @@ class ValidatorTest {
             assertThatThrownBy(() ->
                     Validator.check(text != null)
                             .withError(new IllegalArgumentException("텍스트는 null일 수 없습니다"))
-                            .andCheck(text != null && !text.isBlank())
+                            .check(text != null && !text.isBlank())
                             .withError(new IllegalArgumentException("텍스트는 비어있을 수 없습니다"))
-                            .validateAll()
+                            .validate()
             )
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("텍스트는 null일 수 없습니다");
