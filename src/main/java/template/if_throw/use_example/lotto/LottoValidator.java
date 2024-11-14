@@ -1,7 +1,9 @@
 package template.if_throw.use_example.lotto;
 
 import java.util.List;
+import java.util.function.Supplier;
 import template.if_throw.common.validation.Validator;
+import template.if_throw.common.validation.Validator.ValidationBuilder;
 
 public class LottoValidator {
     private static final int MINIMUM_NUMBER = 1;
@@ -20,33 +22,52 @@ public class LottoValidator {
     }
 
     private static void validateNumbers(List<Integer> numbers) {
-        Validator.check(numbers != null)
-                .withError(new LottoValidationException.NullNumbers())
+        checkNonNull(() -> numbers)
                 .and()
-                .check(numbers.size() == LOTTO_SIZE)
-                .withError(new LottoValidationException.InvalidSize())
+                .checkSize(() -> numbers)
                 .and()
-                .check(hasNoDuplicates(numbers))
-                .withError(new LottoValidationException.DuplicateNumbers())
+                .checkDuplicates(() -> numbers)
                 .validate();
 
-        numbers.forEach(number ->
-                Validator.check(isValidRange(number))
-                        .withError(new LottoValidationException.InvalidRange(number))
-                        .validate()
-        );
+        numbers.forEach(number -> checkRange(() -> number).validate());
+    }
+
+    private static ValidationBuilder checkNonNull(Supplier<List<Integer>> numbers) {
+        return Validator.check(numbers.get() != null)
+                .withError(new LottoValidationException.NullNumbers());
+    }
+
+    private static ValidationBuilder checkSize(Supplier<List<Integer>> numbers) {
+        return Validator.check(numbers.get().size() == LOTTO_SIZE)
+                .withError(new LottoValidationException.InvalidSize());
+    }
+
+    private static ValidationBuilder checkDuplicates(Supplier<List<Integer>> numbers) {
+        return Validator.check(hasNoDuplicates(numbers.get()))
+                .withError(new LottoValidationException.DuplicateNumbers());
+    }
+
+    private static ValidationBuilder checkRange(Supplier<Integer> number) {
+        return Validator.check(isValidRange(number.get()))
+                .withError(new LottoValidationException.InvalidRange(number.get()));
     }
 
     private static void validatePrice(int price) {
-        Validator.check(price >= MINIMUM_PRICE)
-                .withError(new LottoValidationException.InvalidPrice(price))
-                .validate();
+        checkPrice(() -> price).validate();
+    }
+
+    private static ValidationBuilder checkPrice(Supplier<Integer> price) {
+        return Validator.check(price.get() >= MINIMUM_PRICE)
+                .withError(new LottoValidationException.InvalidPrice(price.get()));
     }
 
     private static void validateRound(int round) {
-        Validator.check(round >= MINIMUM_ROUND)
-                .withError(new LottoValidationException.InvalidRound(round))
-                .validate();
+        checkRound(() -> round).validate();
+    }
+
+    private static ValidationBuilder checkRound(Supplier<Integer> round) {
+        return Validator.check(round.get() >= MINIMUM_ROUND)
+                .withError(new LottoValidationException.InvalidRound(round.get()));
     }
 
     private static boolean isValidRange(int number) {
