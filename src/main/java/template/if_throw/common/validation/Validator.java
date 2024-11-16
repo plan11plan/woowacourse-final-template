@@ -51,7 +51,7 @@ public class Validator {
         }
 
         void validate() {
-            if (!condition) {
+            if (condition) {
                 throw exception;
             }
         }

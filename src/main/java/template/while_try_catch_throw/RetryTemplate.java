@@ -17,6 +17,8 @@ public class RetryTemplate {
                 return supplier.get();
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.err.println("예상치 못한 오류: " + e.getMessage());
             }
         }
     }

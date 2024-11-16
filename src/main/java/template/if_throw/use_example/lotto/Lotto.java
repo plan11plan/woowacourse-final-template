@@ -7,8 +7,10 @@ public class Lotto {
     private final List<Integer> numbers;
     private final int price;
     private final int round;
+    private final LottoValidator lottoValidator;
 
     private Lotto(List<Integer> numbers, int price, int round) {
+        this.lottoValidator = new LottoValidator();
         validate(numbers, price, round);
         this.numbers = Collections.unmodifiableList(numbers);
         this.price = price;
@@ -20,7 +22,7 @@ public class Lotto {
     }
 
     private void validate(List<Integer> numbers, int price, int round) {
-        LottoValidator.validate(numbers, price, round);
+        new LottoValidator().validate(numbers, price, round);
     }
 
     public List<Integer> getNumbers() {
